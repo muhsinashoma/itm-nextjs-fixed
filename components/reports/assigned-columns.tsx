@@ -71,34 +71,7 @@ export const assignedColumns = (
       header: "Employee ID",
     },
 
-    // ✅ AVATAR + NAME COLUMN
-    // {
-    //   accessorKey: "employeeName",
-    //   header: "Employee",
-    //   cell: ({ row }) => {
-    //     const device = row.original;
 
-    //     return (
-    //       <div className="flex items-center gap-3">
-    //         <Avatar className="h-8 w-8">
-    //           <AvatarImage src={device.avatarUrl} />
-    //           <AvatarFallback className="bg-muted text-gray-700 text-xs font-semibold">
-    //             {getInitials(device.employeeName)}
-    //           </AvatarFallback>
-    //         </Avatar>
-
-    //         <div className="flex flex-col leading-tight">
-    //           <span className="font-medium">
-    //             {device.employeeName}
-    //           </span>
-    //           <span className="text-xs text-muted-foreground">
-    //             {device.employeeId}
-    //           </span>
-    //         </div>
-    //       </div>
-    //     );
-    //   },
-    // },
 
     {
       accessorKey: "employeeName",

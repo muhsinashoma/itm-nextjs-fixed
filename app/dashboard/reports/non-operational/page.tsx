@@ -1,4 +1,3 @@
-
 // app/dashboard/reports/non-operational/page.tsx
 "use client";
 
@@ -92,6 +91,8 @@ export default function NonOperationalPage() {
         loadData();
     }, [status]);
 
+
+
     /* ================= COLUMNS ================= */
     const columns = assignedColumns({
         onView: (device) => setViewDevice(device),
@@ -136,7 +137,9 @@ export default function NonOperationalPage() {
             </div>
 
             {/* ================= TABLE ================= */}
-            <div className="overflow-x-auto rounded-xl"><DataTable columns={columns} data={data} />
+            <div className="overflow-x-auto rounded-xl">
+                <DataTable columns={columns} data={data} />
+            </div>
 
             {/* ================= VIEW MODAL (REUSABLE) ================= */}
             <DeviceViewModal
@@ -167,7 +170,7 @@ function Card({
         red: "bg-red-50 border-red-200 text-red-600",
         orange: "bg-orange-50 border-orange-200 text-orange-600",
         yellow: "bg-yellow-50 border-yellow-200 text-yellow-600",
-        gray: "bg-muted border-gray-300 text-muted-foreground",
+        gray: "bg-muted border-border text-muted-foreground",
         blue: "bg-blue-50 border-blue-200 text-blue-600",
     };
 

@@ -1,10 +1,12 @@
+
 // app/dashboard/layout.tsx
 "use client";
 
 import { ReactNode, useState } from "react";
 import dynamic from "next/dynamic";
 import { TTGlobalModal } from "@/components/ui/TTGlobalModal";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { DrawerProvider, useDrawer } from "@/context/DrawerContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 
@@ -53,6 +55,9 @@ function DashboardBody({ children }: { children: ReactNode }) {
                 {/* MOBILE SIDEBAR — Sheet overlay */}
                 <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
                     <SheetContent side="left" className="p-0 w-72 bg-card">
+                        <VisuallyHidden.Root>
+                            <SheetTitle>Navigation</SheetTitle>
+                        </VisuallyHidden.Root>
                         <Sidebar onNavigate={() => setMobileNavOpen(false)} />
                     </SheetContent>
                 </Sheet>
@@ -64,14 +69,12 @@ function DashboardBody({ children }: { children: ReactNode }) {
 
                 {/* RIGHT SIDEBAR — hidden on mobile/tablet */}
                 <aside
-                    className={`hidden lg:block border-l border-border bg-card overflow-hidden transition-all duration-300 ease-in-out ${
-                        isOpen ? "w-80" : "w-0"
-                    }`}
+                    className={`hidden lg:block border-l border-border bg-card overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "w-80" : "w-0"
+                        }`}
                 >
                     <div
-                        className={`h-full transition-opacity duration-300 ${
-                            isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-                        }`}
+                        className={`h-full transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                            }`}
                     >
                         <RightSidebar />
                     </div>

@@ -131,8 +131,10 @@ export default function NonOperationalPage() {
                 <Card title="Obsoleted" count={stats.obsoleted} color="gray"
                     onClick={() => router.push("?status=obsoleted")} />
 
+                {/* <Card title="Ownership" count={stats.ownership} color="blue"
+                    onClick={() => router.push("?status=ownership")} /> */}
                 <Card title="Ownership" count={stats.ownership} color="blue"
-                    onClick={() => router.push("?status=ownership")} />
+                    onClick={() => router.push("/dashboard/disposal/ownership-assets")} />
 
             </div>
 

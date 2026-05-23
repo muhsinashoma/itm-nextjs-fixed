@@ -1,3 +1,4 @@
+
 // app/dashboard/page.tsx
 "use client";
 
@@ -10,62 +11,66 @@ import { sections } from "@/components/tt-data";
 import { CHART_FONT } from "@/lib/chart-font";
 import {
     AreaChart, Area, BarChart, Bar, PieChart, Pie,
-    LineChart, Line, Tooltip, ResponsiveContainer, Cell,
-    LabelList, XAxis, Legend,
+    Tooltip, ResponsiveContainer, Cell, LabelList, XAxis,
 } from "recharts";
 
-// ─── Shared card wrapper ───────────────────────────────────────────────
-function DashCard({ children }: { children: React.ReactNode }) {
+// ── Shared helpers ────────────────────────────────────────────────────
+function CardShell({ children }: { children: React.ReactNode }) {
     return (
-        <div className="bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow p-5">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4">
             {children}
         </div>
     );
 }
 
-function CardHeader({ title, kpi, kpiClass = "text-primary", badge }: {
-    title: string; kpi: string | number; kpiClass?: string; badge?: string;
+function CardHead({ title, kpi, kpiClass = "text-primary", badge, onKpiClick }: {
+    title: string; kpi: string | number; kpiClass?: string; badge?: string; onKpiClick?: () => void;
 }) {
     return (
-        <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{title}</h3>
-            <div className="flex items-center gap-2">
-                <span className={`text-xl font-bold ${kpiClass} tabular-nums`}>{kpi}</span>
-                {badge && (
-                    <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">{badge}</span>
-                )}
+        <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">{title}</h3>
+            <div className="flex items-center gap-1.5">
+                <span onClick={onKpiClick} className={`text-lg font-bold tabular-nums ${kpiClass} ${onKpiClick ? "cursor-pointer hover:underline" : ""}`}>
+                    {kpi}
+                </span>
+                {badge && <span className="text-[9px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">{badge}</span>}
             </div>
         </div>
     );
 }
 
-function LegendList({ items, onClickPath }: {
-    items: { label: string; value: number; color: string; status?: string }[];
-    onClickPath?: (status: string) => void;
-}) {
-    const router = useRouter();
+function LegendRow({ label, value, color, onClick }: { label: string; value: number | string; color: string; onClick?: () => void }) {
     return (
-        <div className="space-y-1.5">
-            {items.map((item) => (
-                <div
-                    key={item.label}
-                    onClick={() => onClickPath && router.push(onClickPath.toString().replace("{s}", item.status || item.label))}
-                    className="flex justify-between items-center cursor-pointer hover:bg-muted/60 px-2 py-1.5 rounded-lg transition-colors"
-                >
-                    <span className="text-xs text-muted-foreground flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                        {item.label}
-                    </span>
-                    <span className="text-xs font-semibold text-foreground tabular-nums">
-                        {item.value.toLocaleString()}
-                    </span>
-                </div>
-            ))}
+        <div
+            onClick={onClick}
+            className={`flex justify-between items-center px-2 py-1.5 rounded-lg transition-colors ${onClick ? "cursor-pointer hover:bg-muted/60" : ""}`}
+        >
+            <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                {label}
+            </span>
+            <span className="text-[10px] font-bold text-foreground tabular-nums">{typeof value === "number" ? value.toLocaleString() : value}</span>
         </div>
     );
 }
 
-// ─── Chart data ────────────────────────────────────────────────────────
+const tip = { fontSize: 10, borderRadius: 8, border: "1px solid var(--border)", background: "var(--card)" };
+
+// ── Pie % label ───────────────────────────────────────────────────────
+const PieLabel = ({ cx, cy, midAngle, outerRadius, percent }: any) => {
+    const r = outerRadius + 14;
+    const x = cx + r * Math.cos(-midAngle * Math.PI / 180);
+    const y = cy + r * Math.sin(-midAngle * Math.PI / 180);
+    if (percent < 0.05) return null;
+    return (
+        <text x={x} y={y} fill="var(--foreground)" textAnchor={x > cx ? "start" : "end"}
+            dominantBaseline="central" fontSize={9} fontWeight={600}>
+            {`${(percent * 100).toFixed(0)}%`}
+        </text>
+    );
+};
+
+// ── Static data ───────────────────────────────────────────────────────
 const activeAssetsData = [
     { label: "Assigned", value: 11797, color: "#3b82f6" },
     { label: "Transferred", value: 540, color: "#f59e0b" },
@@ -79,199 +84,262 @@ const nonOpData = [
     { label: "Ownership", value: 1000, color: "#10b981" },
 ];
 
-const warrantyData = [
-    { label: "Claimed", value: 820, color: "#f97316" },
-    { label: "To Vendor", value: 260, color: "#8b5cf6" },
-    { label: "Recovered", value: 710, color: "#3b82f6" },
-    { label: "Expired", value: 150, color: "#ef4444" },
+const warrantyDetails = [
+    { label: "Claimed", value: 820, color: "#f97316", status: "Claimed" },
+    { label: "To Vendor", value: 260, color: "#8b5cf6", status: "To Vendor" },
+    { label: "Recovered", value: 710, color: "#3b82f6", status: "Recovered" },
+    { label: "Expired", value: 150, color: "#ef4444", status: "Expired" },
 ];
+
+const warrantyBarData = [{ year: "2026", claimed: 820, vendor: 260, recovered: 710, expired: 150 }];
 
 const serviceData = [
-    { label: "Open", value: 500, color: "#3b82f6" },
-    { label: "In Progress", value: 250, color: "#f59e0b" },
-    { label: "Closed", value: 175, color: "#10b981" },
+    { label: "Open", value: 500, color: "#3b82f6", status: "Open" },
+    { label: "In Progress", value: 250, color: "#f59e0b", status: "In Progress" },
+    { label: "Closed", value: 175, color: "#10b981", status: "Closed" },
 ];
 
-const resignationData = [
-    { month: "Jan", "Pending Clearance": 2, Completed: 5, "In Process": 1 },
-    { month: "Feb", "Pending Clearance": 1, Completed: 4, "In Process": 2 },
-    { month: "Mar", "Pending Clearance": 2, Completed: 3, "In Process": 1 },
-    { month: "Apr", "Pending Clearance": 5, Completed: 3, "In Process": 2 },
+const serviceBarData = [{ name: "Requests", open: 500, inprogress: 250, closed: 175 }];
+
+const resignationAreaData = [
+    { month: "Jan", pending: 2, completed: 5, inprocess: 1 },
+    { month: "Feb", pending: 1, completed: 4, inprocess: 2 },
+    { month: "Mar", pending: 2, completed: 3, inprocess: 1 },
+    { month: "Apr", pending: 5, completed: 3, inprocess: 2 },
 ];
 
-const renewalData = [
-    { month: "Jan", Upcoming: 5, Completed: 10, Delayed: 2 },
-    { month: "Feb", Upcoming: 4, Completed: 9, Delayed: 3 },
-    { month: "Mar", Upcoming: 6, Completed: 12, Delayed: 2 },
-    { month: "Apr", Upcoming: 5, Completed: 14, Delayed: 3 },
+const resignationLegend = [
+    { label: "Pending Clearance", value: 10, color: "#f59e0b", status: "Pending Clearance" },
+    { label: "Completed", value: 15, color: "#10b981", status: "Completed" },
+    { label: "In Process", value: 6, color: "#3b82f6", status: "In Process" },
+];
+
+const renewalBarData = [
+    { month: "Jan", upcoming: 5, completed: 10, delayed: 2 },
+    { month: "Feb", upcoming: 4, completed: 9, delayed: 3 },
+    { month: "Mar", upcoming: 6, completed: 12, delayed: 2 },
+    { month: "Apr", upcoming: 5, completed: 14, delayed: 3 },
+];
+
+const renewalLegend = [
+    { label: "Upcoming Renewals", value: 20, color: "#f59e0b", status: "Upcoming Renewals" },
+    { label: "Completed", value: 45, color: "#10b981", status: "Completed" },
+    { label: "Delayed", value: 10, color: "#ef4444", status: "Delayed" },
 ];
 
 export default function DashboardPage() {
     const router = useRouter();
+
     const totalAssets = activeAssetsData.reduce((s, i) => s + i.value, 0);
     const totalNonOp = nonOpData.reduce((s, i) => s + i.value, 0);
-    const totalWarranty = warrantyData.reduce((s, i) => s + i.value, 0);
+    const totalWarranty = warrantyDetails.reduce((s, i) => s + i.value, 0);
     const totalService = serviceData.reduce((s, i) => s + i.value, 0);
-    const totalResig = resignationData.reduce((s, d) => s + (d["Pending Clearance"] + d["Completed"] + d["In Process"]), 0);
-    const totalRenewal = renewalData.reduce((s, d) => s + (d.Upcoming + d.Completed + d.Delayed), 0);
+    const totalResig = resignationAreaData.reduce((s, d) => s + d.pending + d.completed + d.inprocess, 0);
+    const totalRenewal = renewalBarData.reduce((s, d) => s + d.upcoming + d.completed + d.delayed, 0);
 
     return (
-        <div className="space-y-4">
-            {/* ── Stat Cards ─────────────────────────────────────────── */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="p-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-                {/* Card 1 — Active Assets */}
-                <DashCard>
-                    <CardHeader title="Total Active Assets" kpi={totalAssets.toLocaleString()} badge="↑ 48%" />
-                    <div className="flex items-stretch gap-4">
-                        <div className="flex-1 min-w-0">
-                            <div className="h-32">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={activeAssetsData} barSize={14}>
-                                        <XAxis dataKey="label" tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
-                                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                                            {activeAssetsData.map((e, i) => <Cell key={i} fill={e.color} />)}
-                                        </Bar>
-                                        <Tooltip formatter={(v: number) => v.toLocaleString()} contentStyle={{ fontSize: 11, borderRadius: 8 }} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
+                {/* ── Card 1: Active Assets ── */}
+                <CardShell>
+                    <CardHead title="Total Active Assets" kpi={totalAssets.toLocaleString()} badge="↑ 48%"
+                        onKpiClick={() => router.push("/dashboard/reports/assets")} />
+                    <div className="flex items-center gap-3">
+                        <div className="w-1/2 h-36">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={activeAssetsData} margin={{ top: 14, right: 2, left: 2, bottom: 0 }}>
+                                    <XAxis dataKey="label" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
+                                    <Bar dataKey="value" radius={[3, 3, 0, 0]}>
+                                        {activeAssetsData.map((e, i) => <Cell key={i} fill={e.color} />)}
+                                        <LabelList dataKey="value" position="top" fontSize={8} fill="var(--foreground)"
+                                            formatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v} />
+                                    </Bar>
+                                    <Tooltip formatter={(v: number) => v.toLocaleString()} contentStyle={tip} />
+                                </BarChart>
+                            </ResponsiveContainer>
                         </div>
-                        <div className="w-px bg-border shrink-0" />
-                        <div className="flex-1 min-w-0 flex items-center">
-                            <LegendList
-                                items={activeAssetsData}
-                                onClickPath={`/dashboard/reports/assets?status={s}`}
-                            />
+                        <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
+                            {activeAssetsData.map(item => (
+                                <LegendRow key={item.label} {...item}
+                                    onClick={() => router.push(`/dashboard/reports/assets?status=${item.label}`)} />
+                            ))}
                         </div>
                     </div>
-                </DashCard>
+                </CardShell>
 
-                {/* Card 2 — Non-Operational */}
-                <DashCard>
-                    <CardHeader title="Non-Operational Assets" kpi={totalNonOp.toLocaleString()} kpiClass="text-red-500" badge="↑ 12%" />
-                    <div className="flex items-stretch gap-4">
-                        <div className="flex-1 min-w-0">
-                            <div className="h-32">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie data={nonOpData} dataKey="value" nameKey="label" cx="50%" cy="50%"
-                                            outerRadius={52} innerRadius={32} paddingAngle={4}>
-                                            {nonOpData.map((e, i) => <Cell key={i} fill={e.color} />)}
-                                        </Pie>
-                                        <Tooltip formatter={(v: number) => v.toLocaleString()} contentStyle={{ fontSize: 11, borderRadius: 8 }} />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
+                {/* ── Card 2: Non-Operational ── */}
+                <CardShell>
+                    <CardHead title="Non-Operational Assets" kpi={totalNonOp.toLocaleString()} kpiClass="text-red-500" badge="↑ 12%"
+                        onKpiClick={() => router.push("/dashboard/reports/non-operational")} />
+                    <div className="flex items-center gap-3">
+                        <div className="w-1/2 h-36">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie data={nonOpData} dataKey="value" nameKey="label"
+                                        cx="50%" cy="50%" outerRadius={52} innerRadius={30}
+                                        paddingAngle={3} labelLine={false} label={<PieLabel />}>
+                                        {nonOpData.map((e, i) => <Cell key={i} fill={e.color} />)}
+                                    </Pie>
+                                    <Tooltip formatter={(v: number) => v.toLocaleString()} contentStyle={tip} />
+                                </PieChart>
+                            </ResponsiveContainer>
                         </div>
-                        <div className="w-px bg-border shrink-0" />
-                        <div className="flex-1 min-w-0 flex items-center">
-                            <LegendList items={nonOpData} />
+                        <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
+                            <LegendRow label="Lost" value={120} color="#ef4444" onClick={() => router.push("/dashboard/reports/non-operational?status=lost")} />
+                            <LegendRow label="Damaged" value={55} color="#f59e0b" onClick={() => router.push("/dashboard/reports/non-operational?status=damaged")} />
+                            <LegendRow label="Ownership" value={1000} color="#10b981" onClick={() => router.push("/dashboard/disposal/ownership-assets")} />
                         </div>
                     </div>
-                </DashCard>
+                </CardShell>
 
-                {/* Card 3 — Warranty */}
-                <DashCard>
-                    <CardHeader title="Warranty Overview" kpi={totalWarranty.toLocaleString()} badge="↑ 18%" />
-                    <div className="flex items-stretch gap-4">
-                        <div className="flex-1 min-w-0">
-                            <div className="h-32">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={warrantyData} barSize={14}>
-                                        <XAxis dataKey="label" tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
-                                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                                            {warrantyData.map((e, i) => <Cell key={i} fill={e.color} />)}
-                                        </Bar>
-                                        <Tooltip formatter={(v: number) => v.toLocaleString()} contentStyle={{ fontSize: 11, borderRadius: 8 }} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
+                {/* ── Card 3: Warranty ── */}
+                <CardShell>
+                    <CardHead title="Warranty Overview" kpi={totalWarranty.toLocaleString()} badge="↑ 18%"
+                        onKpiClick={() => router.push("/dashboard/service-warranty/warranty-claims")} />
+                    <div className="flex items-center gap-3">
+                        <div className="w-1/2 h-36">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={warrantyBarData} margin={{ top: 14, right: 2, left: 2, bottom: 0 }}>
+                                    <XAxis dataKey="year" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
+                                    <Bar dataKey="claimed" fill="#f97316" radius={[3, 3, 0, 0]}>
+                                        <LabelList dataKey="claimed" position="top" fontSize={8} fill="var(--foreground)" />
+                                    </Bar>
+                                    <Bar dataKey="vendor" fill="#8b5cf6" radius={[3, 3, 0, 0]}>
+                                        <LabelList dataKey="vendor" position="top" fontSize={8} fill="var(--foreground)" />
+                                    </Bar>
+                                    <Bar dataKey="recovered" fill="#3b82f6" radius={[3, 3, 0, 0]}>
+                                        <LabelList dataKey="recovered" position="top" fontSize={8} fill="var(--foreground)" />
+                                    </Bar>
+                                    <Bar dataKey="expired" fill="#ef4444" radius={[3, 3, 0, 0]}>
+                                        <LabelList dataKey="expired" position="top" fontSize={8} fill="var(--foreground)" />
+                                    </Bar>
+                                    <Tooltip contentStyle={tip} />
+                                </BarChart>
+                            </ResponsiveContainer>
                         </div>
-                        <div className="w-px bg-border shrink-0" />
-                        <div className="flex-1 min-w-0 flex items-center">
-                            <LegendList items={warrantyData} />
-                        </div>
-                    </div>
-                </DashCard>
-
-                {/* Card 4 — Service Requests */}
-                <DashCard>
-                    <CardHeader title="Service Requests In Progress" kpi={totalService.toLocaleString()} badge="↑ 24%" />
-                    <div className="flex items-stretch gap-4">
-                        <div className="flex-1 min-w-0">
-                            <div className="h-32">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={[{ name: "Requests", ...Object.fromEntries(serviceData.map(d => [d.label, d.value])) }]} barSize={18}>
-                                        <XAxis dataKey="name" tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
-                                        <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
-                                        {serviceData.map((d) => (
-                                            <Bar key={d.label} dataKey={d.label} fill={d.color} radius={[4, 4, 0, 0]} />
-                                        ))}
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-                        <div className="w-px bg-border shrink-0" />
-                        <div className="flex-1 min-w-0 flex items-center">
-                            <LegendList items={serviceData} />
+                        <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
+                            {warrantyDetails.map(item => (
+                                <LegendRow key={item.label} label={item.label} value={item.value} color={item.color}
+                                    onClick={() => router.push(`/dashboard/service-warranty/warranty-claims`)} />
+                            ))}
                         </div>
                     </div>
-                </DashCard>
+                </CardShell>
 
-                {/* Card 5 — Resignation */}
-                <DashCard>
-                    <CardHeader title="Resignation Clearance" kpi={totalResig} kpiClass="text-red-500" badge={`↑ 6%`} />
-                    <div className="h-36">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={resignationData}>
-                                <defs>
-                                    <linearGradient id="rg1" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
-                                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                                    </linearGradient>
-                                    <linearGradient id="rg2" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
-                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <XAxis dataKey="month" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-                                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
-                                <Area type="monotone" dataKey="Pending Clearance" stroke="#f59e0b" strokeWidth={2} fill="url(#rg1)" dot={false} />
-                                <Area type="monotone" dataKey="Completed" stroke="#10b981" strokeWidth={2} fill="url(#rg2)" dot={false} />
-                                <Area type="monotone" dataKey="In Process" stroke="#3b82f6" strokeWidth={2} fill="none" dot={false} />
-                                <Legend wrapperStyle={{ fontSize: 10 }} />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                {/* ── Card 4: Service Requests ── */}
+                <CardShell>
+                    <CardHead title="Service Requests In Progress" kpi={totalService.toLocaleString()} badge="↑ 24%"
+                        onKpiClick={() => router.push("/dashboard/service-warranty/service-claims")} />
+                    <div className="flex items-center gap-3">
+                        <div className="w-1/2 h-36">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={serviceBarData} margin={{ top: 4, right: 2, left: 2, bottom: 0 }}>
+                                    <XAxis dataKey="name" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
+                                    <Bar dataKey="open" fill="#3b82f6" name="Open" radius={[3, 3, 0, 0]} />
+                                    <Bar dataKey="inprogress" fill="#f59e0b" name="In Progress" radius={[3, 3, 0, 0]} />
+                                    <Bar dataKey="closed" fill="#10b981" name="Closed" radius={[3, 3, 0, 0]} />
+                                    <Tooltip contentStyle={tip} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
+                            {serviceData.map(item => (
+                                <LegendRow key={item.label} label={item.label} value={item.value} color={item.color}
+                                    onClick={() => router.push(`/dashboard/service-warranty/service-claims?status=${encodeURIComponent(item.status)}`)} />
+                            ))}
+                        </div>
                     </div>
-                </DashCard>
+                </CardShell>
 
-                {/* Card 6 — Renewal */}
-                <DashCard>
-                    <CardHeader title="Contract Renewal" kpi={totalRenewal} kpiClass="text-emerald-600" badge="↑ 12%" />
-                    <div className="h-36">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={renewalData}>
-                                <XAxis dataKey="month" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-                                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
-                                <Bar dataKey="Upcoming" stackId="a" fill="#f59e0b" radius={[0, 0, 0, 0]} />
-                                <Bar dataKey="Completed" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
-                                <Bar dataKey="Delayed" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                                <Legend wrapperStyle={{ fontSize: 10 }} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                {/* ── Card 5: Resignation Clearance ── */}
+                <CardShell>
+                    <CardHead title="Resignation Clearance" kpi={totalResig} kpiClass="text-red-500" badge="↑ 6%"
+                        onKpiClick={() => router.push("/dashboard/reports/resignation")} />
+                    <div className="flex items-center gap-3">
+                        <div className="w-1/2 h-36">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={resignationAreaData} margin={{ top: 4, right: 2, left: -20, bottom: 0 }}
+                                    onClick={(e) => {
+                                        const key = e?.activePayload?.[0]?.dataKey as string;
+                                        const map: Record<string, string> = { pending: "Pending Clearance", completed: "Completed", inprocess: "In Process" };
+                                        if (map[key]) router.push(`/dashboard/reports/resignation?status=${encodeURIComponent(map[key])}`);
+                                    }}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <defs>
+                                        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis dataKey="month" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
+                                    <Tooltip contentStyle={tip} />
+                                    <Area type="monotone" dataKey="pending" stroke="#f59e0b" strokeWidth={1.5} fill="url(#g1)" dot={false} activeDot={{ r: 4 }} />
+                                    <Area type="monotone" dataKey="completed" stroke="#10b981" strokeWidth={1.5} fill="url(#g2)" dot={false} activeDot={{ r: 4 }} />
+                                    <Area type="monotone" dataKey="inprocess" stroke="#3b82f6" strokeWidth={1.5} fill="url(#g3)" dot={false} activeDot={{ r: 4 }} />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
+                            {resignationLegend.map(item => (
+                                <LegendRow key={item.label} label={item.label} value={item.value} color={item.color}
+                                    onClick={() => router.push(`/dashboard/reports/resignation?status=${encodeURIComponent(item.status)}`)} />
+                            ))}
+                        </div>
                     </div>
-                </DashCard>
+                </CardShell>
+
+                {/* ── Card 6: Contract Renewal ── */}
+                <CardShell>
+                    <CardHead title="Contract Renewal" kpi={totalRenewal} kpiClass="text-emerald-600" badge="↑ 12%"
+                        onKpiClick={() => router.push("/dashboard/reports/renewal")} />
+                    <div className="flex items-center gap-3">
+                        <div className="w-1/2 h-36">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={renewalBarData} margin={{ top: 4, right: 2, left: -20, bottom: 0 }}
+                                    onClick={(e) => {
+                                        const key = e?.activePayload?.[0]?.dataKey as string;
+                                        const map: Record<string, string> = { upcoming: "Upcoming Renewals", completed: "Completed", delayed: "Delayed" };
+                                        if (map[key]) router.push(`/dashboard/reports/renewal?status=${encodeURIComponent(map[key])}`);
+                                    }}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <XAxis dataKey="month" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
+                                    <Tooltip contentStyle={tip} />
+                                    <Bar dataKey="upcoming" stackId="a" fill="#f59e0b" cursor="pointer" />
+                                    <Bar dataKey="completed" stackId="a" fill="#10b981" cursor="pointer" />
+                                    <Bar dataKey="delayed" stackId="a" fill="#ef4444" radius={[3, 3, 0, 0]} cursor="pointer" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
+                            {renewalLegend.map(item => (
+                                <LegendRow key={item.label} label={item.label} value={item.value} color={item.color}
+                                    onClick={() => router.push(`/dashboard/reports/renewal?status=${encodeURIComponent(item.status)}`)} />
+                            ))}
+                        </div>
+                    </div>
+                </CardShell>
+
             </div>
 
-            {/* ── Overview Chart ──────────────────────────────────────── */}
-            <div className="bg-card p-5 rounded-xl border border-border shadow-sm">
+            {/* Overview Chart */}
+            <div className="bg-card p-4 rounded-xl border border-border shadow-sm">
                 <OverviewChart />
             </div>
 
-            {/* ── TT Table ────────────────────────────────────────────── */}
-            <div className="bg-card p-5 rounded-xl border border-border shadow-sm">
-                <h2 className="text-sm font-semibold text-foreground mb-4">Trouble Ticket Table</h2>
+            {/* TT Table */}
+            <div className="bg-card p-4 rounded-xl border border-border shadow-sm">
+                <h2 className="text-xs font-semibold text-foreground mb-3 uppercase tracking-wide">Trouble Ticket Table</h2>
                 <div className="overflow-x-auto">
                     <DataTable columns={columns} data={sections} />
                 </div>

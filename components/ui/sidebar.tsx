@@ -45,7 +45,7 @@ const menuGroups: MenuGroup[] = [
                 icon: Trash2,
                 children: [
                     { title: "All Non-Operational", href: "/dashboard/reports/non-operational/" },
-                    { title: "Ownership Assets", href: "/dashboard/disposal/ownership-assets" },
+                    // { title: "Ownership Assets", href: "/dashboard/disposal/ownership-assets" },
                 ],
             },
         ],

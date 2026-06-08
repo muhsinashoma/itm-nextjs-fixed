@@ -480,32 +480,125 @@ export default function DashboardPage() {
                     </div>
                 </CardShell>
 
+
                 {/* ── Card 6: Contract Renewal ── */}
                 <CardShell>
-                    <CardHead title="Contract Renewal" kpi={totalRenewal} kpiClass="text-emerald-600" badge="↑ 12%"
-                        onKpiClick={() => router.push("/dashboard/reports/renewal")} />
+                    <CardHead
+                        title="Contract Renewal"
+                        kpi={totalRenewal}
+                        kpiClass="text-emerald-600"
+                        badge="↑ 12%"
+                        onKpiClick={() => router.push("/dashboard/reports/renewal")}
+                    />
+
                     <div className="flex items-center gap-3">
                         <div className="w-1/2 h-36">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={renewalBarData} margin={{ top: 4, right: 2, left: -20, bottom: 0 }}
+
+                                <BarChart
+                                    data={renewalBarData}
+                                    margin={{ top: 18, right: 8, left: 0, bottom: 4 }}
+                                    barCategoryGap="28%"
+                                    barGap={0}
                                     onClick={(e) => {
                                         const key = e?.activePayload?.[0]?.dataKey as string;
-                                        const map: Record<string, string> = { upcoming: "Upcoming Renewals", completed: "Completed", delayed: "Delayed" };
-                                        if (map[key]) router.push(`/dashboard/reports/renewal?status=${encodeURIComponent(map[key])}`);
+
+                                        const map: Record<string, string> = {
+                                            upcoming: "Upcoming Renewals",
+                                            completed: "Completed",
+                                            delayed: "Delayed",
+                                        };
+
+                                        if (map[key]) {
+                                            router.push(
+                                                `/dashboard/reports/renewal?status=${encodeURIComponent(map[key])}`
+                                            );
+                                        }
                                     }}
-                                    style={{ cursor: "pointer" }}>
-                                    <XAxis dataKey="month" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <XAxis
+                                        dataKey="month"
+                                        interval={0}
+                                        tick={{ fontSize: 8 }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                        minTickGap={0}
+                                        padding={{ left: 8, right: 8 }}
+                                    />
+
                                     <Tooltip contentStyle={tip} />
-                                    <Bar dataKey="upcoming" stackId="a" fill="#f59e0b" cursor="pointer" />
-                                    <Bar dataKey="completed" stackId="a" fill="#10b981" cursor="pointer" />
-                                    <Bar dataKey="delayed" stackId="a" fill="#ef4444" radius={[3, 3, 0, 0]} cursor="pointer" />
+
+                                    <Bar
+                                        dataKey="upcoming"
+                                        stackId="a"
+                                        fill="#f59e0b"
+                                        cursor="pointer"
+                                        barSize={28}
+                                        maxBarSize={28}
+                                    >
+                                        <LabelList
+                                            dataKey="upcoming"
+                                            position="center"
+                                            fontSize={8}
+                                            fontWeight={700}
+                                            fill="#ffffff"
+                                        />
+                                    </Bar>
+
+                                    <Bar
+                                        dataKey="completed"
+                                        stackId="a"
+                                        fill="#10b981"
+                                        cursor="pointer"
+                                        barSize={28}
+                                        maxBarSize={28}
+                                    >
+                                        <LabelList
+                                            dataKey="completed"
+                                            position="center"
+                                            fontSize={8}
+                                            fontWeight={700}
+                                            fill="#ffffff"
+                                        />
+                                    </Bar>
+
+                                    <Bar
+                                        dataKey="delayed"
+                                        stackId="a"
+                                        fill="#ef4444"
+                                        radius={[3, 3, 0, 0]}
+                                        cursor="pointer"
+                                        barSize={28}
+                                        maxBarSize={28}
+                                    >
+                                        <LabelList
+                                            dataKey="delayed"
+                                            position="center"
+                                            fontSize={8}
+                                            fontWeight={700}
+                                            fill="#ffffff"
+                                        />
+                                    </Bar>
                                 </BarChart>
+
+
                             </ResponsiveContainer>
                         </div>
+
                         <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
-                            {renewalLegend.map(item => (
-                                <LegendRow key={item.label} label={item.label} value={item.value} color={item.color}
-                                    onClick={() => router.push(`/dashboard/reports/renewal?status=${encodeURIComponent(item.status)}`)} />
+                            {renewalLegend.map((item) => (
+                                <LegendRow
+                                    key={item.label}
+                                    label={item.label}
+                                    value={item.value}
+                                    color={item.color}
+                                    onClick={() =>
+                                        router.push(
+                                            `/dashboard/reports/renewal?status=${encodeURIComponent(item.status)}`
+                                        )
+                                    }
+                                />
                             ))}
                         </div>
                     </div>

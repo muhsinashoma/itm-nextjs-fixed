@@ -145,11 +145,12 @@ const PieLabel = (props: any) => {
 // ── Chart data ──────────────────────────────────────────────────────
 
 const activeAssetsData = [
-    { label: "Assigned", value: 11797, color: "#3b82f6" },
-    { label: "Transferred", value: 540, color: "#f59e0b" },
-    { label: "Returned", value: 210, color: "#10b981" },
-    { label: "Available", value: 320, color: "#8b5cf6" },
+    { label: "Assigned", shortLabel: "Assigned", value: 11797, color: "#3b82f6" },
+    { label: "Transferred", shortLabel: "Trans", value: 540, color: "#f59e0b" },
+    { label: "Returned", shortLabel: "Returned", value: 210, color: "#10b981" },
+    { label: "Available", shortLabel: "Avail", value: 320, color: "#8b5cf6" },
 ];
+
 
 const nonOpData = [
     { label: "Lost", value: 120, color: "#ef4444" },
@@ -231,7 +232,26 @@ export default function DashboardPage() {
     const totalResig = resignationAreaData.reduce((s, d) => s + d.pending + d.completed + d.inprocess, 0);
     const totalRenewal = renewalBarData.reduce((s, d) => s + d.upcoming + d.completed + d.delayed, 0);
 
-    //pie chart
+    //bar chart for 1st card
+
+    const ActiveAssetXAxisTick = (props: any) => {
+        const { x, y, payload } = props;
+
+        return (
+            <text
+                x={x}
+                y={y + 10}
+                textAnchor="middle"
+                fill="#6b7280"
+                fontSize={8}
+                fontWeight={500}
+            >
+                {payload.value}
+            </text>
+        );
+    };
+
+    //pie chart for 2nd card
     const getNonOpValue = (label: string) =>
         nonOpData.find((item) => item.label === label)?.value ?? 0;
 
@@ -248,36 +268,82 @@ export default function DashboardPage() {
         <div className="p-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
+
                 {/* ── Card 1: Active Assets ── */}
                 <CardShell>
-                    <CardHead title="Total Active Assets" kpi={totalAssets.toLocaleString()} badge="↑ 48%"
-                        onKpiClick={() => router.push("/dashboard/reports/assets")} />
+                    <CardHead
+                        title="Total Active Assets"
+                        kpi={totalAssets.toLocaleString()}
+                        badge="↑ 48%"
+                        onKpiClick={() => router.push("/dashboard/reports/assets")}
+                    />
+
                     <div className="flex items-center gap-3">
                         <div className="w-1/2 h-36">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={activeAssetsData} margin={{ top: 14, right: 2, left: 2, bottom: 0 }}>
-                                    <XAxis dataKey="label" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
-                                    <Bar dataKey="value" radius={[3, 3, 0, 0]}>
-                                        {activeAssetsData.map((e, i) => <Cell key={i} fill={e.color} />)}
-                                        <LabelList dataKey="value" position="top" fontSize={8} fill="var(--foreground)"
-                                            formatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v} />
+                                <BarChart
+                                    data={activeAssetsData}
+                                    margin={{ top: 16, right: 4, left: 4, bottom: 14 }}
+                                    barCategoryGap="22%"
+                                    barGap={0}
+                                >
+
+                                    <XAxis
+                                        dataKey="shortLabel"
+                                        interval={0}
+                                        minTickGap={0}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tick={<ActiveAssetXAxisTick />}
+                                    />
+
+                                    <Bar
+                                        dataKey="value"
+                                        radius={[3, 3, 0, 0]}
+                                        maxBarSize={34}
+                                    >
+                                        {activeAssetsData.map((item, index) => (
+                                            <Cell key={index} fill={item.color} />
+                                        ))}
+
+                                        <LabelList
+                                            dataKey="value"
+                                            position="top"
+                                            fontSize={8}
+                                            fill="var(--foreground)"
+                                            formatter={(value: number) =>
+                                                value >= 1000
+                                                    ? `${(value / 1000).toFixed(1)}k`
+                                                    : value
+                                            }
+                                        />
                                     </Bar>
-                                    <Tooltip formatter={(v: number) => v.toLocaleString()} contentStyle={tip} />
+
+                                    <Tooltip
+                                        formatter={(value: number) => value.toLocaleString()}
+                                        contentStyle={tip}
+                                    />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
+
                         <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
-                            {activeAssetsData.map(item => (
-                                <LegendRow key={item.label} {...item}
-                                    onClick={() => router.push(`/dashboard/reports/assets?status=${item.label}`)} />
+                            {activeAssetsData.map((item) => (
+                                <LegendRow
+                                    key={item.label}
+                                    {...item}
+                                    onClick={() =>
+                                        router.push(
+                                            `/dashboard/reports/assets?status=${item.label}`
+                                        )
+                                    }
+                                />
                             ))}
                         </div>
                     </div>
                 </CardShell>
 
 
-
-                {/* ── Card 2: Non-Operational ── */}
                 {/* ── Card 2: Non-Operational ── */}
                 <CardShell>
                     <CardHead

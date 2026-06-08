@@ -641,8 +641,8 @@ export default function DashboardPage() {
 
                                 <BarChart
                                     data={renewalBarData}
-                                    margin={{ top: 18, right: 8, left: 0, bottom: 4 }}
-                                    barCategoryGap="28%"
+                                    margin={{ top: 18, right: 10, left: 0, bottom: 4 }}
+                                    barCategoryGap="42%"
                                     barGap={0}
                                     onClick={(e) => {
                                         const key = e?.activePayload?.[0]?.dataKey as string;
@@ -671,7 +671,6 @@ export default function DashboardPage() {
                                         padding={{ left: 8, right: 8 }}
                                     />
 
-
                                     <Tooltip {...cleanTooltipProps} />
 
                                     <Bar
@@ -679,8 +678,8 @@ export default function DashboardPage() {
                                         stackId="a"
                                         fill="#f59e0b"
                                         cursor="pointer"
-                                        barSize={28}
-                                        maxBarSize={28}
+                                        barSize={22}
+                                        maxBarSize={22}
                                         activeBar={false}
                                     >
                                         <LabelList
@@ -697,8 +696,9 @@ export default function DashboardPage() {
                                         stackId="a"
                                         fill="#10b981"
                                         cursor="pointer"
-                                        barSize={28}
-                                        maxBarSize={28}
+                                        barSize={22}
+                                        maxBarSize={22}
+                                        activeBar={false}
                                     >
                                         <LabelList
                                             dataKey="completed"
@@ -715,8 +715,9 @@ export default function DashboardPage() {
                                         fill="#ef4444"
                                         radius={[3, 3, 0, 0]}
                                         cursor="pointer"
-                                        barSize={28}
-                                        maxBarSize={28}
+                                        barSize={22}
+                                        maxBarSize={22}
+                                        activeBar={false}
                                     >
                                         <LabelList
                                             dataKey="delayed"
@@ -727,7 +728,6 @@ export default function DashboardPage() {
                                         />
                                     </Bar>
                                 </BarChart>
-
 
                             </ResponsiveContainer>
                         </div>

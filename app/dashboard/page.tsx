@@ -58,48 +58,13 @@ function LegendRow({ label, value, color, onClick }: {
 
 const tip = { fontSize: 10, borderRadius: 8, border: "1px solid var(--border)", background: "var(--card)" };
 
-
-
-// const PieLabel = (props: any) => {
-//     const { cx, cy, outerRadius, percent, value, name } = props;
-
-//     if (!value || percent <= 0) return null;
-
-//     const label = `${(percent * 100).toFixed(1)}%`;
-
-//     const labelPositions: Record<string, { x: number; y: number }> = {
-//         Damaged: {
-//             x: cx + outerRadius + 6,
-//             y: cy - 30,
-//         },
-//         Lost: {
-//             x: cx + outerRadius + 18,
-//             y: cy - 4,
-//         },
-//         Ownership: {
-//             x: cx - outerRadius - 8,
-//             y: cy + outerRadius - 6,
-//         },
-//     };
-
-//     const position = labelPositions[name];
-
-//     if (!position) return null;
-
-//     return (
-//         <text
-//             x={position.x}
-//             y={position.y}
-//             fill="#111827"
-//             textAnchor="middle"
-//             dominantBaseline="central"
-//             fontSize={9}
-//             fontWeight={700}
-//         >
-//             {label}
-//         </text>
-//     );
-// };
+const cleanTooltipProps = {
+    cursor: false,
+    contentStyle: {
+        ...tip,
+        boxShadow: "0 8px 20px rgba(15, 23, 42, 0.12)",
+    },
+};
 
 const PieLabel = (props: any) => {
     const { cx, cy, outerRadius, percent, value, name } = props;
@@ -301,6 +266,7 @@ export default function DashboardPage() {
                                         dataKey="value"
                                         radius={[3, 3, 0, 0]}
                                         maxBarSize={34}
+                                        activeBar={false}
                                     >
                                         {activeAssetsData.map((item, index) => (
                                             <Cell key={index} fill={item.color} />
@@ -320,8 +286,11 @@ export default function DashboardPage() {
                                     </Bar>
 
                                     <Tooltip
-                                        formatter={(value: number) => value.toLocaleString()}
-                                        contentStyle={tip}
+                                        {...cleanTooltipProps}
+                                        formatter={(value: number, name: string, props: any) => [
+                                            Number(value).toLocaleString(),
+                                            props?.payload?.label || name,
+                                        ]}
                                     />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -381,6 +350,7 @@ export default function DashboardPage() {
                                     </Pie>
 
                                     <Tooltip
+                                        {...cleanTooltipProps}
                                         formatter={(value: number, name: string) => {
                                             const percentage =
                                                 nonOpTotal > 0
@@ -392,7 +362,6 @@ export default function DashboardPage() {
                                                 name,
                                             ];
                                         }}
-                                        contentStyle={tip}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
@@ -448,7 +417,7 @@ export default function DashboardPage() {
                                     }}
                                     style={{ cursor: "pointer" }}>
                                     <XAxis dataKey="year" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
-                                    <Bar dataKey="claimed" fill="#f97316" radius={[3, 3, 0, 0]} cursor="pointer">
+                                    <Bar dataKey="claimed" fill="#f97316" radius={[3, 3, 0, 0]} cursor="pointer" activeBar={false}>
                                         <LabelList dataKey="claimed" position="top" fontSize={8} fill="var(--foreground)" />
                                     </Bar>
                                     <Bar dataKey="vendor" fill="#8b5cf6" radius={[3, 3, 0, 0]} cursor="pointer">
@@ -460,7 +429,8 @@ export default function DashboardPage() {
                                     <Bar dataKey="expired" fill="#ef4444" radius={[3, 3, 0, 0]} cursor="pointer">
                                         <LabelList dataKey="expired" position="top" fontSize={8} fill="var(--foreground)" />
                                     </Bar>
-                                    <Tooltip contentStyle={tip} />
+
+                                    <Tooltip {...cleanTooltipProps} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
@@ -492,7 +462,7 @@ export default function DashboardPage() {
                                     }}
                                     style={{ cursor: "pointer" }}>
                                     <XAxis dataKey="name" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
-                                    <Bar dataKey="servicerequest" fill="#3b82f6" name="Service Request" radius={[3, 3, 0, 0]} cursor="pointer">
+                                    <Bar dataKey="servicerequest" fill="#3b82f6" name="Service Request" radius={[3, 3, 0, 0]} cursor="pointer" activeBar={false}>
                                         <LabelList dataKey="servicerequest" position="top" fontSize={8} fill="var(--foreground)" />
                                     </Bar>
                                     <Bar dataKey="transferred" fill="#f59e0b" name="Tranferred to Vendor" radius={[3, 3, 0, 0]} cursor="pointer">
@@ -501,7 +471,8 @@ export default function DashboardPage() {
                                     <Bar dataKey="closed" fill="#10b981" name="Closed" radius={[3, 3, 0, 0]} cursor="pointer">
                                         <LabelList dataKey="closed" position="top" fontSize={8} fill="var(--foreground)" />
                                     </Bar>
-                                    <Tooltip contentStyle={tip} />
+
+                                    <Tooltip {...cleanTooltipProps} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
@@ -572,7 +543,8 @@ export default function DashboardPage() {
                                         tickLine={false}
                                     />
 
-                                    <Tooltip contentStyle={tip} />
+
+                                    <Tooltip {...cleanTooltipProps} />
 
                                     <Area
                                         type="monotone"
@@ -699,7 +671,8 @@ export default function DashboardPage() {
                                         padding={{ left: 8, right: 8 }}
                                     />
 
-                                    <Tooltip contentStyle={tip} />
+
+                                    <Tooltip {...cleanTooltipProps} />
 
                                     <Bar
                                         dataKey="upcoming"
@@ -708,6 +681,7 @@ export default function DashboardPage() {
                                         cursor="pointer"
                                         barSize={28}
                                         maxBarSize={28}
+                                        activeBar={false}
                                     >
                                         <LabelList
                                             dataKey="upcoming"

@@ -183,11 +183,21 @@ const resignationLegend = [
 ];
 
 // Renewal
+// const renewalBarData = [
+//     { month: "Jan", upcoming: 5, completed: 10, delayed: 2 },
+//     { month: "Feb", upcoming: 4, completed: 9, delayed: 3 },
+//     { month: "Mar", upcoming: 6, completed: 12, delayed: 2 },
+//     { month: "Apr", upcoming: 5, completed: 14, delayed: 3 },
+// ];
+
+
 const renewalBarData = [
     { month: "Jan", upcoming: 5, completed: 10, delayed: 2 },
     { month: "Feb", upcoming: 4, completed: 9, delayed: 3 },
     { month: "Mar", upcoming: 6, completed: 12, delayed: 2 },
     { month: "Apr", upcoming: 5, completed: 14, delayed: 3 },
+    { month: "May", upcoming: 7, completed: 11, delayed: 1 },
+    { month: "Jun", upcoming: 6, completed: 13, delayed: 2 },
 ];
 
 const renewalLegend = [
@@ -497,151 +507,6 @@ export default function DashboardPage() {
 
 
                 {/* ── Card 5: Resignation Clearance ── */}
-                {/* <CardShell>
-                    <CardHead
-                        title="Resignation Clearance"
-                        kpi={totalResig}
-                        kpiClass="text-red-500"
-                        badge="↑ 6%"
-                        onKpiClick={() => router.push("/dashboard/reports/resignation")}
-                    />
-
-                    <div className="flex items-center gap-3">
-                        <div className="w-1/2 h-36">
-                            <ResponsiveContainer width="100%" height="100%">
-
-
-                                <AreaChart
-                                    data={resignationAreaData}
-                                    margin={{ top: 20, right: 8, left: 4, bottom: 8 }}
-                                    onClick={(e) => {
-                                        const key = e?.activePayload?.[0]?.dataKey as string;
-
-                                        const map: Record<string, string> = {
-                                            pending: "Pending Clearance",
-                                            completed: "Completed",
-                                            inprocess: "In Process",
-                                        };
-
-                                        if (map[key]) {
-                                            router.push(
-                                                `/dashboard/reports/resignation?status=${encodeURIComponent(map[key])}`
-                                            );
-                                        }
-                                    }}
-                                    style={{ cursor: "pointer" }}
-                                >
-
-                                    <defs>
-                                        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                                        </linearGradient>
-
-                                        <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                        </linearGradient>
-
-                                        <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-
-
-                                    <XAxis
-                                        dataKey="month"
-                                        interval={0}
-                                        minTickGap={0}
-                                        tick={{ fontSize: 8 }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                        padding={{ left: 8, right: 8 }}
-                                    />
-
-
-                                    <Tooltip {...cleanTooltipProps} />
-
-                                    <Area
-                                        type="monotone"
-                                        dataKey="pending"
-                                        name="Pending"
-                                        stroke="#f59e0b"
-                                        strokeWidth={1.5}
-                                        fill="url(#g1)"
-                                        dot={{ r: 2 }}
-                                        activeDot={{ r: 4 }}
-                                    >
-                                        <LabelList
-                                            dataKey="pending"
-                                            position="top"
-                                            fontSize={8}
-                                            fontWeight={700}
-                                            fill="var(--foreground)"
-                                        />
-                                    </Area>
-
-                                    <Area
-                                        type="monotone"
-                                        dataKey="completed"
-                                        name="Completed"
-                                        stroke="#10b981"
-                                        strokeWidth={1.5}
-                                        fill="url(#g2)"
-                                        dot={{ r: 2 }}
-                                        activeDot={{ r: 4 }}
-                                    >
-                                        <LabelList
-                                            dataKey="completed"
-                                            position="top"
-                                            fontSize={8}
-                                            fontWeight={700}
-                                            fill="var(--foreground)"
-                                        />
-                                    </Area>
-
-                                    <Area
-                                        type="monotone"
-                                        dataKey="inprocess"
-                                        name="In Process"
-                                        stroke="#3b82f6"
-                                        strokeWidth={1.5}
-                                        fill="url(#g3)"
-                                        dot={{ r: 2 }}
-                                        activeDot={{ r: 4 }}
-                                    >
-                                        <LabelList
-                                            dataKey="inprocess"
-                                            position="top"
-                                            fontSize={8}
-                                            fontWeight={700}
-                                            fill="var(--foreground)"
-                                        />
-                                    </Area>
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-
-                        <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
-                            {resignationLegend.map((item) => (
-                                <LegendRow
-                                    key={item.label}
-                                    label={item.label}
-                                    value={item.value}
-                                    color={item.color}
-                                    onClick={() =>
-                                        router.push(
-                                            `/dashboard/reports/resignation?status=${encodeURIComponent(item.status)}`
-                                        )
-                                    }
-                                />
-                            ))}
-                        </div>
-                    </div>
-                </CardShell> */}
-
-                {/* ── Card 5: Resignation Clearance ── */}
                 <CardShell>
                     <CardHead
                         title="Resignation Clearance"
@@ -783,7 +648,7 @@ export default function DashboardPage() {
 
 
                 {/* ── Card 6: Contract Renewal ── */}
-                <CardShell>
+                {/* <CardShell>
                     <CardHead
                         title="Contract Renewal"
                         kpi={totalRenewal}
@@ -793,13 +658,12 @@ export default function DashboardPage() {
                     />
 
                     <div className="flex items-center gap-3">
-                        <div className="w-1/2 h-36">
+                        <div className="w-[60%] h-36">
                             <ResponsiveContainer width="100%" height="100%">
-
                                 <BarChart
                                     data={renewalBarData}
-                                    margin={{ top: 18, right: 10, left: 0, bottom: 4 }}
-                                    barCategoryGap="42%"
+                                    margin={{ top: 18, right: 8, left: 2, bottom: 6 }}
+                                    barCategoryGap="24%"
                                     barGap={0}
                                     onClick={(e) => {
                                         const key = e?.activePayload?.[0]?.dataKey as string;
@@ -821,11 +685,134 @@ export default function DashboardPage() {
                                     <XAxis
                                         dataKey="month"
                                         interval={0}
+                                        minTickGap={0}
                                         tick={{ fontSize: 8 }}
                                         axisLine={false}
                                         tickLine={false}
+                                        padding={{ left: 6, right: 6 }}
+                                    />
+
+                                    <Tooltip {...cleanTooltipProps} />
+
+                                    <Bar
+                                        dataKey="upcoming"
+                                        stackId="a"
+                                        fill="#f59e0b"
+                                        cursor="pointer"
+                                        barSize={20}
+                                        maxBarSize={20}
+                                        activeBar={false}
+                                    >
+                                        <LabelList
+                                            dataKey="upcoming"
+                                            position="center"
+                                            fontSize={8}
+                                            fontWeight={700}
+                                            fill="#ffffff"
+                                        />
+                                    </Bar>
+
+                                    <Bar
+                                        dataKey="completed"
+                                        stackId="a"
+                                        fill="#10b981"
+                                        cursor="pointer"
+                                        barSize={20}
+                                        maxBarSize={20}
+                                        activeBar={false}
+                                    >
+                                        <LabelList
+                                            dataKey="completed"
+                                            position="center"
+                                            fontSize={8}
+                                            fontWeight={700}
+                                            fill="#ffffff"
+                                        />
+                                    </Bar>
+
+                                    <Bar
+                                        dataKey="delayed"
+                                        stackId="a"
+                                        fill="#ef4444"
+                                        radius={[3, 3, 0, 0]}
+                                        cursor="pointer"
+                                        barSize={20}
+                                        maxBarSize={20}
+                                        activeBar={false}
+                                    >
+                                        <LabelList
+                                            dataKey="delayed"
+                                            position="center"
+                                            fontSize={8}
+                                            fontWeight={700}
+                                            fill="#ffffff"
+                                        />
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        <div className="w-[40%] pl-3 border-l border-border space-y-0.5">
+                            {renewalLegend.map((item) => (
+                                <LegendRow
+                                    key={item.label}
+                                    label={item.label}
+                                    value={item.value}
+                                    color={item.color}
+                                    onClick={() =>
+                                        router.push(
+                                            `/dashboard/reports/renewal?status=${encodeURIComponent(item.status)}`
+                                        )
+                                    }
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </CardShell> */}
+
+                {/* ── Card 6: Contract Renewal ── */}
+                <CardShell>
+                    <CardHead
+                        title="Contract Renewal"
+                        kpi={totalRenewal}
+                        kpiClass="text-emerald-600"
+                        badge="↑ 12%"
+                        onKpiClick={() => router.push("/dashboard/reports/renewal")}
+                    />
+
+                    <div className="flex items-center gap-3">
+                        <div className="w-[60%] h-36">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                    data={renewalBarData}
+                                    margin={{ top: 18, right: 8, left: 2, bottom: 6 }}
+                                    barCategoryGap="20%"
+                                    barGap={0}
+                                    onClick={(e) => {
+                                        const key = e?.activePayload?.[0]?.dataKey as string;
+
+                                        const map: Record<string, string> = {
+                                            upcoming: "Upcoming Renewals",
+                                            completed: "Completed",
+                                            delayed: "Delayed",
+                                        };
+
+                                        if (map[key]) {
+                                            router.push(
+                                                `/dashboard/reports/renewal?status=${encodeURIComponent(map[key])}`
+                                            );
+                                        }
+                                    }}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <XAxis
+                                        dataKey="month"
+                                        interval={0}
                                         minTickGap={0}
-                                        padding={{ left: 8, right: 8 }}
+                                        tick={{ fontSize: 8 }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                        padding={{ left: 6, right: 6 }}
                                     />
 
                                     <Tooltip {...cleanTooltipProps} />
@@ -885,27 +872,42 @@ export default function DashboardPage() {
                                         />
                                     </Bar>
                                 </BarChart>
-
                             </ResponsiveContainer>
                         </div>
 
-                        <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
+                    
+                        <div className="w-[40%] pl-3 border-l border-border space-y-1">
                             {renewalLegend.map((item) => (
-                                <LegendRow
+                                <div
                                     key={item.label}
-                                    label={item.label}
-                                    value={item.value}
-                                    color={item.color}
                                     onClick={() =>
                                         router.push(
                                             `/dashboard/reports/renewal?status=${encodeURIComponent(item.status)}`
                                         )
                                     }
-                                />
+                                    className="flex items-center justify-between gap-2 px-1.5 py-1.5 rounded-lg cursor-pointer hover:bg-muted/60 transition-colors"
+                                >
+                                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                        <span
+                                            className="w-2 h-2 rounded-full shrink-0"
+                                            style={{ backgroundColor: item.color }}
+                                        />
+
+                                        <span className="text-[10px] text-muted-foreground leading-tight break-words">
+                                            {item.label}
+                                        </span>
+                                    </div>
+
+                                    <span className="min-w-[22px] text-right text-[10px] font-bold text-foreground tabular-nums shrink-0">
+                                        {item.value.toLocaleString()}
+                                    </span>
+                                </div>
                             ))}
                         </div>
+
                     </div>
                 </CardShell>
+
 
             </div>
 

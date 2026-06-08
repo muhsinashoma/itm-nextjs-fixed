@@ -58,15 +58,86 @@ function LegendRow({ label, value, color, onClick }: {
 
 const tip = { fontSize: 10, borderRadius: 8, border: "1px solid var(--border)", background: "var(--card)" };
 
-const PieLabel = ({ cx, cy, midAngle, outerRadius, percent }: any) => {
-    const r = outerRadius + 14;
-    const x = cx + r * Math.cos(-midAngle * Math.PI / 180);
-    const y = cy + r * Math.sin(-midAngle * Math.PI / 180);
-    if (percent < 0.05) return null;
+
+
+// const PieLabel = (props: any) => {
+//     const { cx, cy, outerRadius, percent, value, name } = props;
+
+//     if (!value || percent <= 0) return null;
+
+//     const label = `${(percent * 100).toFixed(1)}%`;
+
+//     const labelPositions: Record<string, { x: number; y: number }> = {
+//         Damaged: {
+//             x: cx + outerRadius + 6,
+//             y: cy - 30,
+//         },
+//         Lost: {
+//             x: cx + outerRadius + 18,
+//             y: cy - 4,
+//         },
+//         Ownership: {
+//             x: cx - outerRadius - 8,
+//             y: cy + outerRadius - 6,
+//         },
+//     };
+
+//     const position = labelPositions[name];
+
+//     if (!position) return null;
+
+//     return (
+//         <text
+//             x={position.x}
+//             y={position.y}
+//             fill="#111827"
+//             textAnchor="middle"
+//             dominantBaseline="central"
+//             fontSize={9}
+//             fontWeight={700}
+//         >
+//             {label}
+//         </text>
+//     );
+// };
+
+const PieLabel = (props: any) => {
+    const { cx, cy, outerRadius, percent, value, name } = props;
+
+    if (!value || percent <= 0) return null;
+
+    const label = `${(percent * 100).toFixed(1)}%`;
+
+    const labelPositions: Record<string, { x: number; y: number }> = {
+        Damaged: {
+            x: cx + outerRadius + 8,
+            y: cy - 28,
+        },
+        Lost: {
+            x: cx + outerRadius + 18,
+            y: cy - 2,
+        },
+        Ownership: {
+            x: cx,
+            y: cy + outerRadius + 16,
+        },
+    };
+
+    const position = labelPositions[name];
+
+    if (!position) return null;
+
     return (
-        <text x={x} y={y} fill="var(--foreground)" textAnchor={x > cx ? "start" : "end"}
-            dominantBaseline="central" fontSize={9} fontWeight={600}>
-            {`${(percent * 100).toFixed(0)}%`}
+        <text
+            x={position.x}
+            y={position.y}
+            fill="#111827"
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize={9}
+            fontWeight={700}
+        >
+            {label}
         </text>
     );
 };
@@ -160,6 +231,19 @@ export default function DashboardPage() {
     const totalResig = resignationAreaData.reduce((s, d) => s + d.pending + d.completed + d.inprocess, 0);
     const totalRenewal = renewalBarData.reduce((s, d) => s + d.upcoming + d.completed + d.delayed, 0);
 
+    //pie chart
+    const getNonOpValue = (label: string) =>
+        nonOpData.find((item) => item.label === label)?.value ?? 0;
+
+    const lostCount = getNonOpValue("Lost");
+    const damagedCount = getNonOpValue("Damaged");
+    const ownershipCount = getNonOpValue("Ownership");
+
+    const nonOpTotal = lostCount + damagedCount + ownershipCount;
+
+    const damagedPercentage =
+        nonOpTotal > 0 ? ((damagedCount / nonOpTotal) * 100).toFixed(1) : "0";
+
     return (
         <div className="p-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -191,27 +275,91 @@ export default function DashboardPage() {
                     </div>
                 </CardShell>
 
+
+
+                {/* ── Card 2: Non-Operational ── */}
                 {/* ── Card 2: Non-Operational ── */}
                 <CardShell>
-                    <CardHead title="Non-Operational Assets" kpi={totalNonOp.toLocaleString()} kpiClass="text-red-500" badge="↑ 12%"
-                        onKpiClick={() => router.push("/dashboard/reports/non-operational")} />
+                    <CardHead
+                        title="Non-Operational Assets"
+                        kpi={totalNonOp.toLocaleString()}
+                        kpiClass="text-red-500"
+                        badge="↑ 12%"
+                        onKpiClick={() => router.push("/dashboard/reports/non-operational")}
+                    />
+
                     <div className="flex items-center gap-3">
                         <div className="w-1/2 h-36">
                             <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie data={nonOpData} dataKey="value" nameKey="label"
-                                        cx="50%" cy="50%" outerRadius={52} innerRadius={30}
-                                        paddingAngle={3} labelLine={false} label={<PieLabel />}>
-                                        {nonOpData.map((e, i) => <Cell key={i} fill={e.color} />)}
+                                <PieChart margin={{ top: 4, right: 30, bottom: 4, left: 20 }}>
+                                    <Pie
+                                        data={nonOpData}
+                                        dataKey="value"
+                                        nameKey="label"
+                                        cx="46%"
+                                        cy="50%"
+                                        outerRadius={48}
+                                        innerRadius={30}
+                                        paddingAngle={3}
+                                        labelLine={false}
+                                        label={(props) => (
+                                            <PieLabel
+                                                {...props}
+                                                name={props.name || props.label}
+                                            />
+                                        )}
+                                    >
+                                        {nonOpData.map((item, index) => (
+                                            <Cell key={index} fill={item.color} />
+                                        ))}
                                     </Pie>
-                                    <Tooltip formatter={(v: number) => v.toLocaleString()} contentStyle={tip} />
+
+                                    <Tooltip
+                                        formatter={(value: number, name: string) => {
+                                            const percentage =
+                                                nonOpTotal > 0
+                                                    ? ((Number(value) / nonOpTotal) * 100).toFixed(1)
+                                                    : "0";
+
+                                            return [
+                                                `${Number(value).toLocaleString()} (${percentage}%)`,
+                                                name,
+                                            ];
+                                        }}
+                                        contentStyle={tip}
+                                    />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
+
                         <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
-                            <LegendRow label="Lost" value={120} color="#ef4444" onClick={() => router.push("/dashboard/reports/non-operational?status=lost")} />
-                            <LegendRow label="Damaged" value={55} color="#f59e0b" onClick={() => router.push("/dashboard/reports/non-operational?status=damaged")} />
-                            <LegendRow label="Ownership" value={1000} color="#10b981" onClick={() => router.push("/dashboard/disposal/ownership-assets")} />
+                            <LegendRow
+                                label="Ownership"
+                                value={ownershipCount}
+                                color="#10b981"
+                                onClick={() =>
+                                    router.push("/dashboard/disposal/ownership-assets")
+                                }
+                            />
+
+                            <LegendRow
+                                label="Damaged"
+                                value={damagedCount}
+                                color="#f59e0b"
+                                onClick={() =>
+                                    router.push("/dashboard/reports/non-operational?status=damaged")
+                                }
+                            />
+                            <LegendRow
+                                label="Lost"
+                                value={lostCount}
+                                color="#ef4444"
+                                onClick={() =>
+                                    router.push("/dashboard/reports/non-operational?status=lost")
+                                }
+                            />
+
+
                         </div>
                     </div>
                 </CardShell>
@@ -299,48 +447,6 @@ export default function DashboardPage() {
                         </div>
                     </div>
                 </CardShell>
-
-                {/* ── Card 5: Resignation Clearance ── */}
-                {/* <CardShell>
-                    <CardHead title="Resignation Clearance" kpi={totalResig} kpiClass="text-red-500" badge="↑ 6%"
-                        onKpiClick={() => router.push("/dashboard/reports/resignation")} />
-                    <div className="flex items-center gap-3">
-                        <div className="w-1/2 h-36">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={resignationAreaData} margin={{ top: 4, right: 2, left: -20, bottom: 0 }}
-                                    onClick={(e) => {
-                                        const key = e?.activePayload?.[0]?.dataKey as string;
-                                        const map: Record<string, string> = { pending: "Pending Clearance", completed: "Completed", inprocess: "In Process" };
-                                        if (map[key]) router.push(`/dashboard/reports/resignation?status=${encodeURIComponent(map[key])}`);
-                                    }}
-                                    style={{ cursor: "pointer" }}>
-                                    <defs>
-                                        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} /><stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} /><stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} /><stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <XAxis dataKey="month" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
-                                    <Tooltip contentStyle={tip} />
-                                    <Area type="monotone" dataKey="pending" stroke="#f59e0b" strokeWidth={1.5} fill="url(#g1)" dot={false} activeDot={{ r: 4 }} />
-                                    <Area type="monotone" dataKey="completed" stroke="#10b981" strokeWidth={1.5} fill="url(#g2)" dot={false} activeDot={{ r: 4 }} />
-                                    <Area type="monotone" dataKey="inprocess" stroke="#3b82f6" strokeWidth={1.5} fill="url(#g3)" dot={false} activeDot={{ r: 4 }} />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-                        <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
-                            {resignationLegend.map(item => (
-                                <LegendRow key={item.label} label={item.label} value={item.value} color={item.color}
-                                    onClick={() => router.push(`/dashboard/reports/resignation?status=${encodeURIComponent(item.status)}`)} />
-                            ))}
-                        </div>
-                    </div>
-                </CardShell> */}
 
 
                 {/* ── Card 5: Resignation Clearance ── */}

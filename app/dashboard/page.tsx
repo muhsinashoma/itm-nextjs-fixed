@@ -158,12 +158,22 @@ const serviceBarData = [{
     closed: serviceData[2].value,
 }];
 
-// Resignation
+// // Resignation
+// const resignationAreaData = [
+//     { month: "Jan", pending: 2, completed: 5, inprocess: 1 },
+//     { month: "Feb", pending: 1, completed: 4, inprocess: 2 },
+//     { month: "Mar", pending: 2, completed: 3, inprocess: 1 },
+//     { month: "Apr", pending: 5, completed: 3, inprocess: 2 },
+// ];
+
+
 const resignationAreaData = [
     { month: "Jan", pending: 2, completed: 5, inprocess: 1 },
     { month: "Feb", pending: 1, completed: 4, inprocess: 2 },
     { month: "Mar", pending: 2, completed: 3, inprocess: 1 },
     { month: "Apr", pending: 5, completed: 3, inprocess: 2 },
+    { month: "May", pending: 3, completed: 6, inprocess: 2 },
+    { month: "Jun", pending: 4, completed: 7, inprocess: 1 },
 ];
 
 const resignationLegend = [
@@ -487,7 +497,7 @@ export default function DashboardPage() {
 
 
                 {/* ── Card 5: Resignation Clearance ── */}
-                <CardShell>
+                {/* <CardShell>
                     <CardHead
                         title="Resignation Clearance"
                         kpi={totalResig}
@@ -499,9 +509,11 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-3">
                         <div className="w-1/2 h-36">
                             <ResponsiveContainer width="100%" height="100%">
+
+
                                 <AreaChart
                                     data={resignationAreaData}
-                                    margin={{ top: 18, right: 2, left: -20, bottom: 0 }}
+                                    margin={{ top: 20, right: 8, left: 4, bottom: 8 }}
                                     onClick={(e) => {
                                         const key = e?.activePayload?.[0]?.dataKey as string;
 
@@ -519,6 +531,7 @@ export default function DashboardPage() {
                                     }}
                                     style={{ cursor: "pointer" }}
                                 >
+
                                     <defs>
                                         <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
@@ -536,11 +549,15 @@ export default function DashboardPage() {
                                         </linearGradient>
                                     </defs>
 
+
                                     <XAxis
                                         dataKey="month"
+                                        interval={0}
+                                        minTickGap={0}
                                         tick={{ fontSize: 8 }}
                                         axisLine={false}
                                         tickLine={false}
+                                        padding={{ left: 8, right: 8 }}
                                     />
 
 
@@ -607,6 +624,146 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="w-1/2 pl-3 border-l border-border space-y-0.5">
+                            {resignationLegend.map((item) => (
+                                <LegendRow
+                                    key={item.label}
+                                    label={item.label}
+                                    value={item.value}
+                                    color={item.color}
+                                    onClick={() =>
+                                        router.push(
+                                            `/dashboard/reports/resignation?status=${encodeURIComponent(item.status)}`
+                                        )
+                                    }
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </CardShell> */}
+
+                {/* ── Card 5: Resignation Clearance ── */}
+                <CardShell>
+                    <CardHead
+                        title="Resignation Clearance"
+                        kpi={totalResig}
+                        kpiClass="text-red-500"
+                        badge="↑ 6%"
+                        onKpiClick={() => router.push("/dashboard/reports/resignation")}
+                    />
+
+                    <div className="flex items-center gap-3">
+                        <div className="w-[65%] h-36">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart
+                                    data={resignationAreaData}
+                                    margin={{ top: 20, right: 12, left: 6, bottom: 8 }}
+                                    onClick={(e) => {
+                                        const key = e?.activePayload?.[0]?.dataKey as string;
+
+                                        const map: Record<string, string> = {
+                                            pending: "Pending Clearance",
+                                            completed: "Completed",
+                                            inprocess: "In Process",
+                                        };
+
+                                        if (map[key]) {
+                                            router.push(
+                                                `/dashboard/reports/resignation?status=${encodeURIComponent(map[key])}`
+                                            );
+                                        }
+                                    }}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <defs>
+                                        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                        </linearGradient>
+
+                                        <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                        </linearGradient>
+
+                                        <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+
+                                    <XAxis
+                                        dataKey="month"
+                                        interval={0}
+                                        minTickGap={0}
+                                        tick={{ fontSize: 8 }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                        padding={{ left: 8, right: 8 }}
+                                    />
+
+                                    <Tooltip {...cleanTooltipProps} />
+
+                                    <Area
+                                        type="monotone"
+                                        dataKey="pending"
+                                        name="Pending"
+                                        stroke="#f59e0b"
+                                        strokeWidth={1.5}
+                                        fill="url(#g1)"
+                                        dot={{ r: 2 }}
+                                        activeDot={{ r: 4 }}
+                                    >
+                                        <LabelList
+                                            dataKey="pending"
+                                            position="top"
+                                            fontSize={8}
+                                            fontWeight={700}
+                                            fill="var(--foreground)"
+                                        />
+                                    </Area>
+
+                                    <Area
+                                        type="monotone"
+                                        dataKey="completed"
+                                        name="Completed"
+                                        stroke="#10b981"
+                                        strokeWidth={1.5}
+                                        fill="url(#g2)"
+                                        dot={{ r: 2 }}
+                                        activeDot={{ r: 4 }}
+                                    >
+                                        <LabelList
+                                            dataKey="completed"
+                                            position="top"
+                                            fontSize={8}
+                                            fontWeight={700}
+                                            fill="var(--foreground)"
+                                        />
+                                    </Area>
+
+                                    <Area
+                                        type="monotone"
+                                        dataKey="inprocess"
+                                        name="In Process"
+                                        stroke="#3b82f6"
+                                        strokeWidth={1.5}
+                                        fill="url(#g3)"
+                                        dot={{ r: 2 }}
+                                        activeDot={{ r: 4 }}
+                                    >
+                                        <LabelList
+                                            dataKey="inprocess"
+                                            position="top"
+                                            fontSize={8}
+                                            fontWeight={700}
+                                            fill="var(--foreground)"
+                                        />
+                                    </Area>
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        <div className="w-[35%] pl-3 border-l border-border space-y-0.5">
                             {resignationLegend.map((item) => (
                                 <LegendRow
                                     key={item.label}

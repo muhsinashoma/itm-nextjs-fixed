@@ -332,7 +332,6 @@ export default function DashboardPage() {
                     </div>
                 </CardShell>
 
-
                 {/* ── Card 2: Non-Operational ── */}
                 <CardShell>
                     <CardHead
@@ -419,7 +418,7 @@ export default function DashboardPage() {
                     </div>
                 </CardShell>
 
-                {/* ── Card 3: Warranty ── */}
+                {/* ── Card 3: Warranty Overview── */}
                 <CardShell>
                     <CardHead title="Warranty Overview" kpi={totalWarranty.toLocaleString()} badge="↑ 18%"
                         onKpiClick={() => router.push("/dashboard/service-warranty/warranty-claims")} />
@@ -505,7 +504,6 @@ export default function DashboardPage() {
                     </div>
                 </CardShell>
 
-
                 {/* ── Card 5: Resignation Clearance ── */}
                 <CardShell>
                     <CardHead
@@ -517,11 +515,11 @@ export default function DashboardPage() {
                     />
 
                     <div className="flex items-center gap-3">
-                        <div className="w-[65%] h-36">
+                        <div className="w-[55%] h-36">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart
                                     data={resignationAreaData}
-                                    margin={{ top: 20, right: 12, left: 6, bottom: 8 }}
+                                    margin={{ top: 20, right: 8, left: 4, bottom: 8 }}
                                     onClick={(e) => {
                                         const key = e?.activePayload?.[0]?.dataKey as string;
 
@@ -563,7 +561,7 @@ export default function DashboardPage() {
                                         tick={{ fontSize: 8 }}
                                         axisLine={false}
                                         tickLine={false}
-                                        padding={{ left: 8, right: 8 }}
+                                        padding={{ left: 6, right: 6 }}
                                     />
 
                                     <Tooltip {...cleanTooltipProps} />
@@ -628,147 +626,38 @@ export default function DashboardPage() {
                             </ResponsiveContainer>
                         </div>
 
-                        <div className="w-[35%] pl-3 border-l border-border space-y-0.5">
+                        <div className="w-[45%] pl-3 border-l border-border space-y-1">
                             {resignationLegend.map((item) => (
-                                <LegendRow
+                                <div
                                     key={item.label}
-                                    label={item.label}
-                                    value={item.value}
-                                    color={item.color}
                                     onClick={() =>
                                         router.push(
                                             `/dashboard/reports/resignation?status=${encodeURIComponent(item.status)}`
                                         )
                                     }
-                                />
+                                    className="grid grid-cols-[1fr_28px] items-center gap-2 px-1.5 py-1.5 rounded-lg cursor-pointer hover:bg-muted/60 transition-colors"
+                                >
+                                    <div className="flex items-center gap-1.5 min-w-0">
+                                        <span
+                                            className="w-2 h-2 rounded-full shrink-0"
+                                            style={{ backgroundColor: item.color }}
+                                        />
+
+                                        <span className="text-[10px] text-muted-foreground leading-tight whitespace-normal">
+                                            {item.label}
+                                        </span>
+                                    </div>
+
+                                    <span className="text-right text-[10px] font-bold text-foreground tabular-nums shrink-0">
+                                        {typeof item.value === "number"
+                                            ? item.value.toLocaleString()
+                                            : item.value}
+                                    </span>
+                                </div>
                             ))}
                         </div>
                     </div>
                 </CardShell>
-
-
-                {/* ── Card 6: Contract Renewal ── */}
-                {/* <CardShell>
-                    <CardHead
-                        title="Contract Renewal"
-                        kpi={totalRenewal}
-                        kpiClass="text-emerald-600"
-                        badge="↑ 12%"
-                        onKpiClick={() => router.push("/dashboard/reports/renewal")}
-                    />
-
-                    <div className="flex items-center gap-3">
-                        <div className="w-[60%] h-36">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                    data={renewalBarData}
-                                    margin={{ top: 18, right: 8, left: 2, bottom: 6 }}
-                                    barCategoryGap="24%"
-                                    barGap={0}
-                                    onClick={(e) => {
-                                        const key = e?.activePayload?.[0]?.dataKey as string;
-
-                                        const map: Record<string, string> = {
-                                            upcoming: "Upcoming Renewals",
-                                            completed: "Completed",
-                                            delayed: "Delayed",
-                                        };
-
-                                        if (map[key]) {
-                                            router.push(
-                                                `/dashboard/reports/renewal?status=${encodeURIComponent(map[key])}`
-                                            );
-                                        }
-                                    }}
-                                    style={{ cursor: "pointer" }}
-                                >
-                                    <XAxis
-                                        dataKey="month"
-                                        interval={0}
-                                        minTickGap={0}
-                                        tick={{ fontSize: 8 }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                        padding={{ left: 6, right: 6 }}
-                                    />
-
-                                    <Tooltip {...cleanTooltipProps} />
-
-                                    <Bar
-                                        dataKey="upcoming"
-                                        stackId="a"
-                                        fill="#f59e0b"
-                                        cursor="pointer"
-                                        barSize={20}
-                                        maxBarSize={20}
-                                        activeBar={false}
-                                    >
-                                        <LabelList
-                                            dataKey="upcoming"
-                                            position="center"
-                                            fontSize={8}
-                                            fontWeight={700}
-                                            fill="#ffffff"
-                                        />
-                                    </Bar>
-
-                                    <Bar
-                                        dataKey="completed"
-                                        stackId="a"
-                                        fill="#10b981"
-                                        cursor="pointer"
-                                        barSize={20}
-                                        maxBarSize={20}
-                                        activeBar={false}
-                                    >
-                                        <LabelList
-                                            dataKey="completed"
-                                            position="center"
-                                            fontSize={8}
-                                            fontWeight={700}
-                                            fill="#ffffff"
-                                        />
-                                    </Bar>
-
-                                    <Bar
-                                        dataKey="delayed"
-                                        stackId="a"
-                                        fill="#ef4444"
-                                        radius={[3, 3, 0, 0]}
-                                        cursor="pointer"
-                                        barSize={20}
-                                        maxBarSize={20}
-                                        activeBar={false}
-                                    >
-                                        <LabelList
-                                            dataKey="delayed"
-                                            position="center"
-                                            fontSize={8}
-                                            fontWeight={700}
-                                            fill="#ffffff"
-                                        />
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-
-                        <div className="w-[40%] pl-3 border-l border-border space-y-0.5">
-                            {renewalLegend.map((item) => (
-                                <LegendRow
-                                    key={item.label}
-                                    label={item.label}
-                                    value={item.value}
-                                    color={item.color}
-                                    onClick={() =>
-                                        router.push(
-                                            `/dashboard/reports/renewal?status=${encodeURIComponent(item.status)}`
-                                        )
-                                    }
-                                />
-                            ))}
-                        </div>
-                    </div>
-                </CardShell> */}
 
                 {/* ── Card 6: Contract Renewal ── */}
                 <CardShell>
@@ -780,13 +669,13 @@ export default function DashboardPage() {
                         onKpiClick={() => router.push("/dashboard/reports/renewal")}
                     />
 
-                    <div className="flex items-center gap-3">
-                        <div className="w-[60%] h-36">
+                    <div className="flex items-center gap-2">
+                        <div className="w-[54%] h-36">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart
                                     data={renewalBarData}
-                                    margin={{ top: 18, right: 8, left: 2, bottom: 6 }}
-                                    barCategoryGap="20%"
+                                    margin={{ top: 18, right: 4, left: 0, bottom: 6 }}
+                                    barCategoryGap="18%"
                                     barGap={0}
                                     onClick={(e) => {
                                         const key = e?.activePayload?.[0]?.dataKey as string;
@@ -812,18 +701,18 @@ export default function DashboardPage() {
                                         tick={{ fontSize: 8 }}
                                         axisLine={false}
                                         tickLine={false}
-                                        padding={{ left: 6, right: 6 }}
+                                        padding={{ left: 4, right: 4 }}
                                     />
 
                                     <Tooltip {...cleanTooltipProps} />
 
                                     <Bar
                                         dataKey="upcoming"
-                                        stackId="a"
+                                        stackId="renewal"
                                         fill="#f59e0b"
                                         cursor="pointer"
-                                        barSize={22}
-                                        maxBarSize={22}
+                                        barSize={20}
+                                        maxBarSize={20}
                                         activeBar={false}
                                     >
                                         <LabelList
@@ -837,11 +726,11 @@ export default function DashboardPage() {
 
                                     <Bar
                                         dataKey="completed"
-                                        stackId="a"
+                                        stackId="renewal"
                                         fill="#10b981"
                                         cursor="pointer"
-                                        barSize={22}
-                                        maxBarSize={22}
+                                        barSize={20}
+                                        maxBarSize={20}
                                         activeBar={false}
                                     >
                                         <LabelList
@@ -855,12 +744,12 @@ export default function DashboardPage() {
 
                                     <Bar
                                         dataKey="delayed"
-                                        stackId="a"
+                                        stackId="renewal"
                                         fill="#ef4444"
                                         radius={[3, 3, 0, 0]}
                                         cursor="pointer"
-                                        barSize={22}
-                                        maxBarSize={22}
+                                        barSize={20}
+                                        maxBarSize={20}
                                         activeBar={false}
                                     >
                                         <LabelList
@@ -875,8 +764,7 @@ export default function DashboardPage() {
                             </ResponsiveContainer>
                         </div>
 
-                    
-                        <div className="w-[40%] pl-3 border-l border-border space-y-1">
+                        <div className="w-[46%] pl-2 border-l border-border space-y-1">
                             {renewalLegend.map((item) => (
                                 <div
                                     key={item.label}
@@ -885,26 +773,25 @@ export default function DashboardPage() {
                                             `/dashboard/reports/renewal?status=${encodeURIComponent(item.status)}`
                                         )
                                     }
-                                    className="flex items-center justify-between gap-2 px-1.5 py-1.5 rounded-lg cursor-pointer hover:bg-muted/60 transition-colors"
+                                    className="grid grid-cols-[1fr_28px] items-center gap-2 px-1 py-1.5 rounded-lg cursor-pointer hover:bg-muted/60 transition-colors"
                                 >
-                                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                    <div className="flex items-center gap-1.5 min-w-0">
                                         <span
                                             className="w-2 h-2 rounded-full shrink-0"
                                             style={{ backgroundColor: item.color }}
                                         />
 
-                                        <span className="text-[10px] text-muted-foreground leading-tight break-words">
+                                        <span className="text-[10px] text-muted-foreground leading-tight whitespace-normal">
                                             {item.label}
                                         </span>
                                     </div>
 
-                                    <span className="min-w-[22px] text-right text-[10px] font-bold text-foreground tabular-nums shrink-0">
+                                    <span className="text-right text-[10px] font-bold text-foreground tabular-nums shrink-0">
                                         {item.value.toLocaleString()}
                                     </span>
                                 </div>
                             ))}
                         </div>
-
                     </div>
                 </CardShell>
 
